@@ -11,6 +11,11 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+
+    if (!interaction.member.permissions.has("MANAGE_MESSAGES")) {
+      await interaction.reply("No tienes permisos suficientes para ejecutar este comando.");
+      return;
+    }
     const amount = interaction.options.getInteger("amount");
     if (amount <= 0) {
       await interaction.reply("La cantidad debe ser mayor a 0");
