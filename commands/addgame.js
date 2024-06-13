@@ -65,8 +65,21 @@ module.exports = {
           { name: "Android", value: "Android" },
           { name: "Otros", value: "Otros" }
         )
+    )
+    .addStringOption((option) =>
+      option
+        .setName("language")
+        .setDescription("El idioma del juego")
+        .setRequired(true)
+        .addChoices(
+          { name: "Español", value: "Espanol" },
+          { name: "Inglés", value: "Ingles" },
+          { name: "Japónes", value: "Japones" }
+        )
     ),
   async execute(interaction, connection) {
+
+    return interaction.reply({ content: "Funcionalidad no disponible", ephemeral: true });
 
     const member = await interaction.guild.members.fetch(interaction.user.id);
 
@@ -75,6 +88,7 @@ module.exports = {
       return;
     }
 
+    const language = interaction.options.getString("language");
     const title = interaction.options.getString("title");
     const description = interaction.options.getString("description");
     const size = interaction.options.getString("size");
@@ -84,15 +98,28 @@ module.exports = {
     const device = interaction.options.getString('device');
 
     connection.query(
-      "INSERT INTO games (title, description, size, image, downloadLink, category, device) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [title, description, size, image, downloadLink, category, device],
+      "INSERT INTO juegos (titulo, descripcion, tamano, imagen_url, categoria) VALUES (?,?,?,?,?)",
+      [title, description, size, image, category],
       (error, results) => {
         if (error) {
           console.error(error);
           return;
         }
+
+        connection.query(
+          "INSERT INTO descargas (juego_id, dispositivo, idioma, link_descarga) VALUES (?,?,?,?)",
+          [results.insertId, device, language, downloadLink],
+          (error, results) => {
+            if (error) {
+              console.error(error);
+              return;
+            }
+          }
+        );
       }
     );
+
+    
     await interaction.reply({ content: "Juego añadido correctamente", ephemeral: true });
   },
 };
