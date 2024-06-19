@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require("discord.js");
+const { convertToObjectArray } = require("../utils/convertToObjectArray");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -44,11 +45,10 @@ module.exports = {
     const description = interaction.options.getString("description");
     const size = interaction.options.getString("size");
     const image = interaction.options.getString("image");
-    const buttonsJson = interaction.options.getString("botones");
-
+    const buttonsInFormat = interaction.options.getString("botones");
     let downloadLinks;
     try {
-      downloadLinks = JSON.parse(buttonsJson);
+      downloadLinks = convertToObjectArray(buttonsInFormat);
       if (
         !Array.isArray(downloadLinks) ||
         downloadLinks.some((link) => !link.nombre || !link.url)
