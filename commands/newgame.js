@@ -36,7 +36,7 @@ module.exports = {
         .setRequired(true)
     ),
 
-  async execute(interaction) {
+  async execute(interaction, connection) {
     if (!interaction.member.permissions.has("ADMINISTRATOR")) {
       await interaction.reply({ content: "No tienes permisos suficientes para ejecutar este comando.", ephemeral: true });
       return;
@@ -46,6 +46,7 @@ module.exports = {
     const size = interaction.options.getString("size");
     const image = interaction.options.getString("image");
     const buttonsInFormat = interaction.options.getString("botones");
+    let imgs = image.split(",");
     let downloadLinks;
     try {
       downloadLinks = convertToObjectArray(buttonsInFormat);
@@ -69,7 +70,7 @@ module.exports = {
       .setColor(0x00ae86);
 
     if (image) {
-      embed.setImage(image);
+      embed.setImage(imgs[0]);
     }
 
     // Crear los botones en filas (Discord permite hasta 5 botones por fila)
@@ -86,7 +87,16 @@ module.exports = {
       });
       rows.push(buttons);
     }
-
+    connection.query(`INSERT INTO games (title, description, size, images, links) VALUES (?, ?, ?, ?, ?);`,
+      [title, description, size, JSON.stringify(imgs), JSON.stringify(downloadLinks)], 
+      async (err, result) => {
+        if (err) {
+          console.log(err);
+          await interaction.reply({ content: "Error al insertar el juego en la base de datos.", ephemeral: true });
+          return;
+        };
+        console.log("Game added to database");
+    });
     await interaction.reply({ embeds: [embed], components: rows });
   },
 };
