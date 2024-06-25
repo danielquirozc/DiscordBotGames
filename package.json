@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "registerCommands": "node deploy-commands.js"
+    "start": "node deploy-comands && node index.js"
   },
   "keywords": [],
   "author": "AmChiwa",
