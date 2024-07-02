@@ -1,4 +1,4 @@
-const connection = require('../database');
+const pool = require('../database');
 const { Collection } = require('discord.js');
 const fs = require('fs');
 
@@ -20,7 +20,7 @@ module.exports = {
     if (!command) return;
 
     try {
-      await command.execute(interaction, connection);
+      await command.execute(interaction, pool);
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'Hubo un error al ejecutar este comando.', ephemeral: true });

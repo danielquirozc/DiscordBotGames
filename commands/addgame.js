@@ -46,7 +46,7 @@ module.exports = {
         )
     ),
 
-  async execute(interaction, connection) {
+  async execute(interaction, pool) {
     if (!interaction.member.permissions.has("ADMINISTRATOR")) {
       await interaction.reply({ content: "No tienes permisos suficientes para ejecutar este comando.", ephemeral: true });
       return;
@@ -70,17 +70,20 @@ module.exports = {
      return await interaction.reply({ content: 'Formato de botones o imagenes inválido. Asegúrate de escribir bien el formato.', ephemeral: true });
     }
 
-    // Crear los botones en filas (Discord permite hasta 5 botones por fila)
-    connection.query(`INSERT INTO games (title, description, size, images, links, type) VALUES (?, ?, ?, ?, ?, ?);`,
-      [title, description, size, JSON.stringify(imgs), JSON.stringify(downloadLinks), tipo],
-      async (err, result) => {
-        if (err) {
-          console.log(err);
-          await interaction.reply({ content: "Error al insertar el juego en la base de datos.", ephemeral: true });
+    pool.getConnection(async (err, connection) => {
+      if (err) throw err;
+      connection.query(`INSERT INTO games (title, description, size, images, links, type) VALUES (?, ?, ?, ?, ?, ?);`,
+        [title, description, size, JSON.stringify(imgs), JSON.stringify(downloadLinks), tipo],
+        async (err, result) => {
+          if (err) {
+            console.log(err);
+            await interaction.reply({ content: "Error al insertar el juego en la base de datos.", ephemeral: true });
+            return;
+          };
+          await interaction.reply({ content: "Juego insertado correctamente.", ephemeral: true });
           return;
-        };
-        await interaction.reply({ content: "Juego insertado correctamente.", ephemeral: true });
-        return;
-      });
+        });
+      connection.release();
+    });
   },
 };
