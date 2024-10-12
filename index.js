@@ -1,27 +1,25 @@
-require('dotenv').config();
-const { Client, Collection } = require('discord.js');
-const fs = require('fs');
+const { Client } = require('discord.js')
+const supabase = require('./database.js')
+require('dotenv').config()
 
-const client = new Client({ intents: 3276799 });
+const client = new Client({ intents: 32767 })
 
-client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`)
+})
 
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.data.name, command);
-}
-
-const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-  if (event.once) {
-    client.once(event.name, (...args) => event.execute(...args));
-  } else {
-    client.on(event.name, (...args) => event.execute(...args));
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return
+  if (!interaction.memberPermissions.has('ADMINISTRATOR')) {
+    await interaction.reply({
+      content: 'No tienes permisos para ejecutar este comando',
+      ephemeral: true
+    })
+    return
   }
-}
+  const { commandName } = interaction
+  const command = require(`./commands/${commandName}.js`)
+  await command.execute(interaction, supabase)
+})
 
-
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN)
