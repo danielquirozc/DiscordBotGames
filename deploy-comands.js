@@ -1,15 +1,6 @@
 require('dotenv').config();
 const { REST, Routes } = require('discord.js');
 const fs = require('fs');
-const http = require('http');
-
-const port = process.env.PORT || 3000;
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Status: Active');
-});
-server.listen(port, () => console.log(`Listening on port ${port}`));
 
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));

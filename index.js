@@ -1,6 +1,7 @@
 const { Client } = require('discord.js')
 const supabase = require('./database.js')
 require('dotenv').config()
+const http = require('http')
 
 const client = new Client({ intents: 32767 })
 
@@ -23,3 +24,12 @@ client.on('interactionCreate', async interaction => {
 })
 
 client.login(process.env.DISCORD_TOKEN)
+
+const port = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Status: Active');
+});
+
+server.listen(port, () => console.log(`Listening on port ${port}`));
