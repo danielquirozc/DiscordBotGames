@@ -14,7 +14,7 @@ module.exports = {
       option
         .setName('alias')
         .setDescription('Alias of the shortened URL')
-        .setRequired(true)
+        .setRequired(false)
     )
     .addStringOption(option =>
       option
@@ -28,7 +28,7 @@ module.exports = {
   async execute (interaction) {
     const url = interaction.options.getString('url')
     const title = interaction.options.getString('title')
-    const alias = interaction.options.getString('alias')
+    const alias = interaction.options.getString('alias') || null
     let cutyUrl
     let fclcUrl
     try {
