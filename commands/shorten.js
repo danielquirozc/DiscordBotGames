@@ -8,7 +8,16 @@ module.exports = {
     .setName('shorten')
     .setDescription('Shorten URL')
     .addStringOption(option =>
-      option.setName('url').setDescription('URL to shorten').setRequired(true)
+      option.setName('url')
+      .setDescription('URL to shorten')
+      .setRequired(true)
+    )
+    .addStringOption(option =>
+      option
+      .setName('title')
+      .setDescription('Title of the shortened URL')
+      .setRequired(true)
+      .setMaxLength(50)
     )
     .addStringOption(option =>
       option
@@ -16,18 +25,11 @@ module.exports = {
         .setDescription('Alias of the shortened URL')
         .setRequired(false)
     )
-    .addStringOption(option =>
-      option
-        .setName('title')
-        .setDescription('Title of the shortened URL')
-        .setRequired(true)
-        .setMaxLength(50)
-    )
     .setDMPermission(false),
-
-  async execute (interaction) {
-    const url = interaction.options.getString('url')
-    const title = interaction.options.getString('title')
+    
+    async execute (interaction) {
+      const url = interaction.options.getString('url')
+      const title = interaction.options.getString('title')
     const alias = interaction.options.getString('alias') || null
     let cutyUrl
     let fclcUrl
